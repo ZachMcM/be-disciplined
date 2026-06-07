@@ -1,0 +1,36 @@
+# dependencies
+node_modules/
+
+# env
+.env
+.env.*
+!.env.example
+
+# logs
+*.log
+npm-debug.log*
+
+# build output
+dist/
+build/
+
+# expo
+client/.expo/
+client/dist/
+client/web-build/
+client/ios/
+client/android/
+*.orig.*
+
+# native
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# misc
+.DS_Store
+*.tgz
+.idea/
+.vscode/

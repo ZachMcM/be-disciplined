@@ -1,0 +1,16 @@
+{
+  "name": "be-disciplined",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Be Disciplined — a zachstack monorepo (Expo client + Express server).",
+  "scripts": {
+    "dev": "concurrently -n server,client -c blue,green \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
+    "dev:client": "npm --prefix client run dev",
+    "dev:server": "npm --prefix server run dev",
+    "install:all": "npm --prefix server install && npm --prefix client install",
+    "build:server": "npm --prefix server run build"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
