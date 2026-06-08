@@ -44,18 +44,6 @@ export async function serverRequest<T = any>({
   return data as T;
 }
 
-export type Me = {
-  id: string;
-  name: string;
-  email: string;
-  image: string | null;
-  expoPushToken: string | null;
-};
-
-export async function getMe() {
-  return serverRequest<Me>({ endpoint: '/users/me' });
-}
-
 export async function patchExpoPushToken(expoPushToken: string) {
   return serverRequest({
     endpoint: '/users/expo-push-token',
