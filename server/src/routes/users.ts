@@ -8,24 +8,6 @@ import { authMiddleware } from "../utils/middleware";
 
 export const usersRoute = Router();
 
-/** Current authenticated user. */
-usersRoute.get("/users/me", authMiddleware, async (_req, res) => {
-  try {
-    const me = await db.query.user.findFirst({
-      where: eq(user.id, res.locals.userId!),
-    });
-
-    if (!me) {
-      res.status(404).json({ error: "User not found" });
-      return;
-    }
-
-    res.json(me);
-  } catch (error) {
-    handleError(error, res, "GET /users/me");
-  }
-});
-
 const ExpoPushTokenSchema = z.object({
   expoPushToken: z.string().min(1),
 });

@@ -79,7 +79,11 @@ function RootNavigator() {
       </Stack.Protected>
 
       <Stack.Protected guard={!isPending && session !== null}>
-        <Stack.Screen name="(protected)" />
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen
+          name="create"
+          options={{ presentation: 'modal', headerShown: true, title: 'New post' }}
+        />
       </Stack.Protected>
 
       <Stack.Protected guard={!isPending && session === null}>
