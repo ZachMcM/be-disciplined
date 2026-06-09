@@ -1,0 +1,1 @@
+ALTER TABLE "user" ADD COLUMN "onboarding_step" text DEFAULT 'name' NOT NULL;

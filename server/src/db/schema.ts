@@ -35,6 +35,11 @@ export const user = pgTable(
 
     // Expo push notification token (registered from the client after sign-in).
     expoPushToken: text("expo_push_token"),
+
+    onboardingStep: text("onboarding_step")
+      .default("name")
+      .notNull()
+      .$type<"name" | "complete">(),
   },
   (table) => [index("user_email_idx").on(table.email)],
 );

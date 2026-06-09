@@ -12,6 +12,15 @@ export const auth = betterAuth({
   session: {
     expiresIn: 365 * 24 * 60 * 60, // one year
   },
+  user: {
+    additionalFields: {
+      onboardingStep: {
+        type: "string",
+        defaultValue: "name",
+        required: false,
+      },
+    },
+  },
   plugins: [
     expo(),
     emailOTP({

@@ -34,3 +34,5 @@ client/android/
 *.tgz
 .idea/
 .vscode/
+
+dump.rdb

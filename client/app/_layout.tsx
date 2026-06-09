@@ -72,17 +72,28 @@ function RootNavigator() {
   usePushTokenRegistration();
   useNotificationObserver(!!session);
 
+  const isAuthenticated = !isPending && session !== null;
+  const onboardingStep = isAuthenticated ? (session.user.onboardingStep ?? 'name') : null;
+  const onboardingComplete = onboardingStep === 'complete';
+
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Protected guard={isPending}>
         <Stack.Screen name="loading" />
       </Stack.Protected>
 
-      <Stack.Protected guard={!isPending && session !== null}>
+      <Stack.Protected guard={isAuthenticated && onboardingComplete}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
           name="create"
           options={{ presentation: 'modal', headerShown: true, title: 'New post' }}
+        />
+      </Stack.Protected>
+
+      <Stack.Protected guard={isAuthenticated && onboardingStep === 'name'}>
+        <Stack.Screen
+          name="(onboarding)/name"
+          options={{ headerShown: true, title: 'Be Disciplined', headerBackVisible: false }}
         />
       </Stack.Protected>
 

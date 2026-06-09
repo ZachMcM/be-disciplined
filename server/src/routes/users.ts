@@ -8,6 +8,29 @@ import { authMiddleware } from "../utils/middleware";
 
 export const usersRoute = Router();
 
+const NameSchema = z.object({
+  name: z.string().min(1),
+});
+
+usersRoute.patch("/users/name", authMiddleware, async (req, res) => {
+  try {
+    const parsed = NameSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.message });
+      return;
+    }
+
+    await db
+      .update(user)
+      .set({ name: parsed.data.name, onboardingStep: "complete" })
+      .where(eq(user.id, res.locals.userId!));
+
+    res.json({ success: true });
+  } catch (error) {
+    handleError(error, res, "PATCH /users/name");
+  }
+});
+
 const ExpoPushTokenSchema = z.object({
   expoPushToken: z.string().min(1),
 });

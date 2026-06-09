@@ -51,3 +51,11 @@ export async function patchExpoPushToken(expoPushToken: string) {
     body: JSON.stringify({ expoPushToken }),
   });
 }
+
+export async function patchUserName(name: string) {
+  return serverRequest({
+    endpoint: '/users/name',
+    method: 'PATCH',
+    body: JSON.stringify({ name }),
+  });
+}
