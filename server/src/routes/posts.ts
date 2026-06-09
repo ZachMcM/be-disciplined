@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import { Router } from "express";
 import * as z from "zod";
 import { db } from "../db";
@@ -62,7 +61,7 @@ postsRoute.post(
       }
 
       const ext = file.originalname.split(".").pop() ?? "jpg";
-      const key = `posts/${res.locals.userId}/${randomUUID()}.${ext}`;
+      const key = `posts/${res.locals.userId}/${crypto.randomUUID()}.${ext}`;
       const url = await uploadToR2({ key, body: file.buffer, contentType: file.mimetype });
 
       res.status(201).json({ url });
@@ -89,7 +88,6 @@ postsRoute.post("/posts", authMiddleware, async (req, res) => {
     const newPost = await db
       .insert(post)
       .values({
-        id: randomUUID(),
         userId: res.locals.userId!,
         imageUrl,
         caption,

@@ -8,6 +8,7 @@ import {
   text,
   timestamp,
   unique,
+  uuid,
 } from "drizzle-orm/pg-core";
 import { Tag } from "../config.ts/tags";
 
@@ -127,7 +128,7 @@ export type TagMetadata = {
 export const friend = pgTable(
   "friend",
   {
-    id: text("id").primaryKey(),
+    id: uuid("id").primaryKey().defaultRandom(),
     requesterId: text("requester_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
@@ -154,7 +155,7 @@ export const friend = pgTable(
 export const post = pgTable(
   "post",
   {
-    id: text("id").primaryKey(),
+    id: uuid("id").primaryKey().defaultRandom(),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
@@ -174,7 +175,7 @@ export const post = pgTable(
 export const like = pgTable(
   "like",
   {
-    id: text("id").primaryKey(),
+    id: uuid("id").primaryKey().defaultRandom(),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
@@ -192,7 +193,7 @@ export const like = pgTable(
 export const comment = pgTable(
   "comment",
   {
-    id: text("id").primaryKey(),
+    id: uuid("id").primaryKey().defaultRandom(),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
@@ -212,7 +213,7 @@ export const comment = pgTable(
 export const postChallenge = pgTable(
   "post_challenge",
   {
-    id: text("id").primaryKey(),
+    id: uuid("id").primaryKey().defaultRandom(),
     postId: text("post_id")
       .notNull()
       .references(() => post.id, { onDelete: "cascade" }),
@@ -239,7 +240,7 @@ export const postChallenge = pgTable(
 export const userGoal = pgTable(
   "user_goal",
   {
-    id: text("id").primaryKey(),
+    id: uuid("id").primaryKey().defaultRandom(),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
@@ -256,7 +257,7 @@ export const userGoal = pgTable(
 );
 
 export const group = pgTable("group", {
-  id: text("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   description: text("description"),
   endDate: timestamp("end_date").notNull(),
@@ -273,7 +274,7 @@ export const group = pgTable("group", {
 export const groupUser = pgTable(
   "group_user",
   {
-    id: text("id").primaryKey(),
+    id: uuid("id").primaryKey().defaultRandom(),
     groupId: text("group_id")
       .notNull()
       .references(() => group.id, { onDelete: "cascade" }),
