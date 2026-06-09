@@ -1,4 +1,4 @@
-import { DarkTheme, DefaultTheme, type Theme } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme } from 'expo-router';
 
 // Default React Native Reusables (neutral) theme — kept in sync with global.css.
 export const THEME = {
@@ -48,7 +48,7 @@ export const THEME = {
   },
 };
 
-export const NAV_THEME: Record<'light' | 'dark', Theme> = {
+export const NAV_THEME: Record<'light' | 'dark', typeof DarkTheme> = {
   light: {
     ...DefaultTheme,
     colors: {

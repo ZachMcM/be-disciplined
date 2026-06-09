@@ -5,9 +5,9 @@
   "main": "./dist/index.js",
   "type": "commonjs",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc",
     "start": "node dist/index.js",
+    "build": "mkdir dist && npm install && tsc",
+    "dev": "nodemon src/index.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push"
