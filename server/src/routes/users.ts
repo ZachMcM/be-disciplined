@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq, ilike, ne } from "drizzle-orm";
 import { Router } from "express";
 import * as z from "zod";
 import { db } from "../db";
@@ -58,3 +58,24 @@ usersRoute.patch(
     }
   },
 );
+
+/** GET /users/search?query= — search users by name (excludes self). */
+usersRoute.get("/users/search", authMiddleware, async (req, res) => {
+  try {
+    const query = typeof req.query.query === "string" ? req.query.query.trim() : "";
+    if (!query) {
+      res.json([]);
+      return;
+    }
+
+    const results = await db
+      .select({ id: user.id, name: user.name, image: user.image })
+      .from(user)
+      .where(and(ilike(user.name, `%${query}%`), ne(user.id, res.locals.userId!)))
+      .limit(20);
+
+    res.json(results);
+  } catch (error) {
+    handleError(error, res, "GET /users/search");
+  }
+});
