@@ -69,9 +69,9 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="(activity)"
+        name="(groups)"
         options={{
-          title: "Friends",
+          title: "Groups",
           tabBarIcon: ({ color }) => (
             <Icon as={UsersIcon} size={20} color={color} />
           ),
