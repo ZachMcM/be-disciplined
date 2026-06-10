@@ -44,6 +44,29 @@ export async function serverRequest<T = any>({
   return data as T;
 }
 
+// ─── Tags ─────────────────────────────────────────────────────────────────────
+
+export type Category = 'Fitness' | 'Health' | 'Learning';
+
+export type ScoringBucket =
+  | 'strength_training'
+  | 'cardio'
+  | 'sports'
+  | 'nutrition'
+  | 'study'
+  | 'career';
+
+export type Tag = {
+  tag: string;
+  category: Category;
+  scoringBucket: ScoringBucket;
+  basePoints: number;
+};
+
+export function getTags(): Promise<Tag[]> {
+  return serverRequest({ endpoint: '/tags' });
+}
+
 // ─── Friends ──────────────────────────────────────────────────────────────────
 
 export type FriendUser = {
