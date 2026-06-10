@@ -1,7 +1,6 @@
 CREATE TYPE "public"."friend_status" AS ENUM('pending', 'accepted', 'rejected', 'blocked');--> statement-breakpoint
 CREATE TYPE "public"."group_user_role" AS ENUM('admin', 'member');--> statement-breakpoint
 CREATE TYPE "public"."post_challenge_status" AS ENUM('pending', 'upheld', 'overturned');--> statement-breakpoint
-CREATE TYPE "public"."post_tag" AS ENUM('Weightlifting', 'Running', 'Swimming', 'Cycling', 'Hiking', 'Yoga', 'Basketball', 'Football', 'Soccer', 'Baseball', 'Tennis', 'Volleyball', 'Martial Arts', 'Other Sport', 'Healthy Meal', 'Meal Prep', 'Cooking at Home', 'Studying', 'Reading', 'Online Course', 'Programming', 'Writing', 'Job Application', 'Resume Work', 'Interview Prep', 'Research', 'Skill Practice');--> statement-breakpoint
 CREATE TYPE "public"."recurrence_type" AS ENUM('daily', 'weekly', 'monthly');--> statement-breakpoint
 CREATE TABLE "account" (
 	"id" text PRIMARY KEY NOT NULL,
@@ -20,16 +19,16 @@ CREATE TABLE "account" (
 );
 --> statement-breakpoint
 CREATE TABLE "comment" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" text NOT NULL,
-	"post_id" text NOT NULL,
+	"post_id" integer NOT NULL,
 	"body" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "friend" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"requester_id" text NOT NULL,
 	"addressee_id" text NOT NULL,
 	"status" "friend_status" DEFAULT 'pending' NOT NULL,
@@ -39,7 +38,7 @@ CREATE TABLE "friend" (
 );
 --> statement-breakpoint
 CREATE TABLE "group" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"description" text,
 	"end_date" timestamp NOT NULL,
@@ -49,8 +48,8 @@ CREATE TABLE "group" (
 );
 --> statement-breakpoint
 CREATE TABLE "group_user" (
-	"id" text PRIMARY KEY NOT NULL,
-	"group_id" text NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
+	"group_id" integer NOT NULL,
 	"user_id" text NOT NULL,
 	"role" "group_user_role" DEFAULT 'member' NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -59,27 +58,27 @@ CREATE TABLE "group_user" (
 );
 --> statement-breakpoint
 CREATE TABLE "like" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" text NOT NULL,
-	"post_id" text NOT NULL,
+	"post_id" integer NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "like_user_post_unique" UNIQUE("user_id","post_id")
 );
 --> statement-breakpoint
 CREATE TABLE "post" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" text NOT NULL,
 	"image_url" text NOT NULL,
 	"caption" text,
-	"tag" "post_tag" NOT NULL,
+	"tag" jsonb,
 	"points" integer NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "post_challenge" (
-	"id" text PRIMARY KEY NOT NULL,
-	"post_id" text NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
+	"post_id" integer NOT NULL,
 	"challenger_id" text NOT NULL,
 	"status" "post_challenge_status" DEFAULT 'pending' NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -108,13 +107,14 @@ CREATE TABLE "user" (
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	"expo_push_token" text,
+	"onboarding_step" text DEFAULT 'name' NOT NULL,
 	CONSTRAINT "user_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
 CREATE TABLE "user_goal" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" text NOT NULL,
-	"tag" "post_tag" NOT NULL,
+	"tag" jsonb,
 	"frequency" integer NOT NULL,
 	"recurrence_type" "recurrence_type" NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,

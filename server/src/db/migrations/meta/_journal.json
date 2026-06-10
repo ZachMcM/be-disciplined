@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1780880225759,
-      "tag": "0000_amused_carlie_cooper",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1780972516403,
-      "tag": "0001_funny_tusk",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1780975444145,
-      "tag": "0002_add_onboarding_step",
+      "when": 1781052366447,
+      "tag": "0000_careless_harpoon",
       "breakpoints": true
     }
   ]
