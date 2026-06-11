@@ -6,7 +6,6 @@
     "orientation": "portrait",
     "scheme": "be-disciplined",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.example.bedisciplined",
@@ -15,7 +14,6 @@
       }
     },
     "android": {
-      "edgeToEdgeEnabled": true,
       "package": "com.example.bedisciplined"
     },
     "web": {
