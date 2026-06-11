@@ -4,6 +4,7 @@ import { Text } from "@/components/ui/text";
 import { authClient } from "@/lib/auth-client";
 import { patchUserImage, uploadUserImage } from "@/lib/endpoints";
 import { useMutation } from "@tanstack/react-query";
+import { File } from "expo-file-system";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { Camera } from "lucide-react-native";
@@ -14,20 +15,15 @@ import { toast } from "sonner-native";
 export default function ImageOnboardingScreen() {
   const { refetch: refetchAuthClient } = authClient.useSession();
 
-  // Local URI shown immediately for preview; remote URL returned by R2 once the
-  // upload settles. Continue stays disabled until `uploadedUrl` is available.
   const [previewUri, setPreviewUri] = useState<string | null>(null);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
 
   const { mutate: upload, isPending: isUploading } = useMutation({
-    mutationFn: (asset: ImagePicker.ImagePickerAsset) => {
-      const formData = new FormData();
+    mutationFn: async (asset: ImagePicker.ImagePickerAsset) => {
       const name = asset.fileName ?? `avatar.${asset.uri.split(".").pop() ?? "jpg"}`;
-      formData.append("image", {
-        uri: asset.uri,
-        name,
-        type: asset.mimeType ?? "image/jpeg",
-      } as any);
+      const file = new File(asset.uri);
+      const formData = new FormData();
+      formData.append("image", file, name);
       return uploadUserImage(formData);
     },
     onSuccess: ({ url }) => {
@@ -35,6 +31,7 @@ export default function ImageOnboardingScreen() {
     },
     onError: (error) => {
       setPreviewUri(null);
+      console.log(error)
       toast.error(error.message ?? "Failed to upload image", {
         position: "bottom-center",
       });
@@ -90,12 +87,7 @@ export default function ImageOnboardingScreen() {
                 contentFit="cover"
               />
             ) : (
-              <Icon as={Camera} className="size-10 text-muted-foreground" />
-            )}
-            {isUploading && (
-              <View className="absolute inset-0 items-center justify-center bg-black/40">
-                <ActivityIndicator size="small" color="#fff" />
-              </View>
+              <Icon as={Camera} className="size-12 text-muted-foreground" />
             )}
           </View>
         </Pressable>

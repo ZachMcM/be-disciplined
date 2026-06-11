@@ -10,7 +10,7 @@ import { uploadToR2 } from "../utils/r2";
 
 export const usersRoute = Router();
 
-const ALLOWED_IMAGE_MIME_TYPES = [
+const allowedImageMimeTypes = [
   "image/jpeg",
   "image/png",
   "image/webp",
@@ -58,8 +58,8 @@ usersRoute.post(
       }
 
       if (
-        !ALLOWED_IMAGE_MIME_TYPES.includes(
-          file.mimetype as (typeof ALLOWED_IMAGE_MIME_TYPES)[number],
+        !allowedImageMimeTypes.includes(
+          file.mimetype as (typeof allowedImageMimeTypes)[number],
         )
       ) {
         res.status(400).json({ error: "File must be an image" });
