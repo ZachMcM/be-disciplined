@@ -46,6 +46,28 @@ Currently available RNR components in `components/ui/`:
 `avatar`, `aspect-ratio`, `button`, `card`, `icon`, `input`, `label`, `separator`,
 `skeleton`, `text`
 
+## Installing Expo modules
+
+**Always install Expo modules with `npx expo install <package>`, never plain
+`npm install`.** `expo install` resolves the version that matches the project's
+Expo SDK and wires up the native module so Metro can resolve it. Plain
+`npm install` pulls an incompatible version and leaves the native side
+unregistered, which surfaces at runtime as errors like:
+
+```
+Requiring unknown module "4197". If you are sure the module exists, try
+restarting Metro. You may also want to run `yarn` or `npm install`.
+```
+
+Run it inside `client/` (or `npx --prefix client expo install <package>` from
+root). Examples that bit us:
+
+- `npx expo install expo-image-picker` — required before importing
+  `expo-image-picker`, otherwise the module fails to resolve at runtime.
+- `npx expo install expo-network` — a transitive dependency of Better Auth's
+  Expo client; without it the auth flow errored until installed (this is also
+  why the `@better-auth/expo` patch in `patches/` exists — keep both).
+
 ## Server conventions (`server/src`)
 
 - **Entry point:** `index.ts` — wires Express, Socket.IO, the Better Auth handler
