@@ -74,10 +74,7 @@ export default function NameOnboardingScreen() {
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
-                  className={cn(
-                    errors.firstName && "border-destructive",
-                    "rounded-full",
-                  )}
+                  className={cn(errors.firstName && "border-destructive")}
                   autoCapitalize="words"
                   textContentType="givenName"
                   returnKeyType="next"
@@ -100,10 +97,7 @@ export default function NameOnboardingScreen() {
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
-                  className={cn(
-                    errors.lastName && "border-destructive",
-                    "rounded-full",
-                  )}
+                  className={cn(errors.lastName && "border-destructive")}
                   autoCapitalize="words"
                   textContentType="familyName"
                   returnKeyType="done"

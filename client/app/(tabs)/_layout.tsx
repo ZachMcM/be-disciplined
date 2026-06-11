@@ -1,82 +1,57 @@
-import { ProfileTabIcon } from "@/components/tabs/ProfileTabIcon";
-import { Button } from "@/components/ui/button";
-import { Icon } from "@/components/ui/icon";
+import { authClient } from "@/lib/auth-client";
 import { THEME } from "@/lib/theme";
-import { Link, Tabs } from "expo-router";
-import { HomeIcon, PlusIcon, TrophyIcon, UsersIcon } from "lucide-react-native";
+import { router } from "expo-router";
+import { NativeTabs } from "expo-router/unstable-native-tabs";
 import { useColorScheme } from "nativewind";
-import { Pressable, View } from "react-native";
 
 export default function TabsLayout() {
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? "light"];
 
+  const { data: session } = authClient.useSession();
+  const avatarUri = session?.user?.image;
+
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: theme.primary,
-        tabBarInactiveTintColor: theme.mutedForeground,
-        tabBarStyle: {
-          backgroundColor: theme.background,
-          borderTopColor: theme.border,
-        },
-      }}
-    >
-      <Tabs.Screen
-        name="(home)"
-        options={{
-          title: "Home",
-          tabBarIcon: ({ color }) => (
-            <Icon as={HomeIcon} size={20} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="(leaderboard)"
-        options={{
-          title: "Leaderboard",
-          tabBarIcon: ({ color }) => (
-            <Icon as={TrophyIcon} size={20} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
+    <NativeTabs tintColor={theme.primary}>
+      <NativeTabs.Trigger name="(home)">
+        <NativeTabs.Trigger.Label hidden>Home</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="house.fill" md="home" />
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="(leaderboard)">
+        <NativeTabs.Trigger.Label hidden>Leaderboard</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="trophy.fill" md="trophy" />
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger
         name="add"
-        options={{
-          title: "Create",
-          tabBarLabel: () => null,
-          tabBarButton: () => (
-            <View className="flex flex-1 justify-center items-center">
-              <Link href="/create" asChild>
-                <Button className="rounded-2xl" size="icon">
-                  <Icon
-                    as={PlusIcon}
-                    size={26}
-                    className="text-primary-foreground"
-                  />
-                </Button>
-              </Link>
-            </View>
-          ),
+        // Native tabs can't use a custom tab button. `disabled` keeps the tab
+        // from ever being selected (so `add` never renders) while still emitting
+        // `tabPress`, which we use to present the `/create` modal instead.
+        disabled
+        listeners={{
+          tabPress: () => router.push("/create"),
         }}
-      />
-      <Tabs.Screen
-        name="(profile)"
-        options={{
-          title: "Profile",
-          tabBarIcon: ({ focused }) => <ProfileTabIcon focused={focused} />,
-        }}
-      />
-      <Tabs.Screen
-        name="(groups)"
-        options={{
-          title: "Groups",
-          tabBarIcon: ({ color }) => (
-            <Icon as={UsersIcon} size={20} color={color} />
-          ),
-        }}
-      />
-    </Tabs>
+      >
+        <NativeTabs.Trigger.Label hidden>Create</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="plus.circle.fill" md="add_circle" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="(profile)">
+        <NativeTabs.Trigger.Label hidden>Profile</NativeTabs.Trigger.Label>
+        {avatarUri ? (
+          <NativeTabs.Trigger.Icon
+            src={{ uri: avatarUri }}
+            renderingMode="original"
+          />
+        ) : (
+          <NativeTabs.Trigger.Icon sf="person.crop.circle.fill" md="person" />
+        )}
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="(groups)">
+        <NativeTabs.Trigger.Label hidden>Groups</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="person.2.fill" md="groups" />
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }

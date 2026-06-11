@@ -1,5 +1,5 @@
-import { FriendsScreen } from '@/components/FriendsScreen';
+import { View } from "react-native";
 
-export default function FriendsTab() {
-  return <FriendsScreen />;
+export default function GroupsTab() {
+  return <View className="flex-1 bg-background" />;
 }

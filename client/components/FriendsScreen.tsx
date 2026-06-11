@@ -310,7 +310,6 @@ export function FriendsScreen() {
           onChangeText={setSearchQuery}
           autoCapitalize="none"
           autoCorrect={false}
-          className="bg-secondary border-0 rounded-2xl"
         />
       </View>
 
