@@ -116,3 +116,23 @@ export async function patchUserName(name: string) {
     body: JSON.stringify({ name }),
   });
 }
+
+/**
+ * Uploads a profile image to R2 and returns its public URL. The user row is not
+ * touched here — call `patchUserImage` with the returned url to persist it.
+ */
+export async function uploadUserImage(formData: FormData): Promise<{ url: string }> {
+  return serverRequest({
+    endpoint: '/users/image',
+    method: 'POST',
+    formData,
+  });
+}
+
+export async function patchUserImage(image: string) {
+  return serverRequest({
+    endpoint: '/users/image',
+    method: 'PATCH',
+    body: JSON.stringify({ image }),
+  });
+}

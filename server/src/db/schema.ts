@@ -39,7 +39,7 @@ export const user = pgTable(
     onboardingStep: text("onboarding_step")
       .default("name")
       .notNull()
-      .$type<"name" | "complete">(),
+      .$type<"name" | "image" | "complete">(),
   },
   (table) => [index("user_email_idx").on(table.email)],
 );

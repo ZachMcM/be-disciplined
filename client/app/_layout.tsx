@@ -97,6 +97,13 @@ function RootNavigator() {
         />
       </Stack.Protected>
 
+      <Stack.Protected guard={isAuthenticated && onboardingStep === 'image'}>
+        <Stack.Screen
+          name="(onboarding)/image"
+          options={{ headerShown: true, title: 'Be Disciplined', headerBackVisible: false }}
+        />
+      </Stack.Protected>
+
       <Stack.Protected guard={!isPending && session === null}>
         <Stack.Screen name="auth" options={{ headerShown: true, title: 'Be Disciplined' }} />
       </Stack.Protected>
