@@ -1,8 +1,8 @@
-import { Avatar } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
-import { Text } from '@/components/ui/text';
+import { Avatar } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { Text } from "@/components/ui/text";
 import {
   FriendRecord,
   FriendsData,
@@ -13,18 +13,13 @@ import {
   getFriends,
   searchUsers,
   sendFriendRequest,
-} from '@/lib/endpoints';
-import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
-import { Check, MoreHorizontal, X } from 'lucide-react-native';
-import { useCallback, useState } from 'react';
-import { ActivityIndicator, FlatList, ScrollView, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-// ─── Query key ───────────────────────────────────────────────────────────────
-
-export const FRIENDS_QUERY_KEY = ['friends'];
-
-// ─── Sub-components ──────────────────────────────────────────────────────────
+} from "@/lib/endpoints";
+import { getInitials } from "@/lib/utils";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { Check, MoreHorizontal, X } from "lucide-react-native";
+import { useCallback, useState } from "react";
+import { ActivityIndicator, FlatList, ScrollView, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 function SectionHeader({ title, badge }: { title: string; badge?: number }) {
   return (
@@ -41,22 +36,6 @@ function SectionHeader({ title, badge }: { title: string; badge?: number }) {
   );
 }
 
-function UserAvatar({ user }: { user: FriendUser }) {
-  const initials = user.name
-    .split(' ')
-    .map((w) => w[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
-  return (
-    <Avatar
-      source={user.image ? { uri: user.image } : undefined}
-      alt={initials}
-      className="size-12"
-    />
-  );
-}
-
 function RequestItem({
   item,
   onAccept,
@@ -68,13 +47,21 @@ function RequestItem({
 }) {
   return (
     <View className="flex-row items-center gap-3 px-4 py-3">
-      <UserAvatar user={item.friendUser} />
+      <Avatar
+        source={
+          item.friendUser.image ? { uri: item.friendUser.image } : undefined
+        }
+        alt={getInitials(item.friendUser.name)}
+        className="size-12"
+      />
       <View className="flex-1">
-        <Text className="font-semibold text-foreground">{item.friendUser.name}</Text>
+        <Text className="font-semibold text-foreground">
+          {item.friendUser.name}
+        </Text>
         {item.mutualFriendCount > 0 && (
           <Text className="text-sm text-muted-foreground">
-            {item.mutualFriendCount} mutual{' '}
-            {item.mutualFriendCount === 1 ? 'friend' : 'friends'}
+            {item.mutualFriendCount} mutual{" "}
+            {item.mutualFriendCount === 1 ? "friend" : "friends"}
           </Text>
         )}
       </View>
@@ -110,10 +97,20 @@ function SentRequestItem({
   const requestedAgo = formatRequestedAgo(item.createdAt);
   return (
     <View className="flex-row items-center gap-3 px-4 py-3">
-      <UserAvatar user={item.friendUser} />
+      <Avatar
+        source={
+          item.friendUser.image ? { uri: item.friendUser.image } : undefined
+        }
+        alt={getInitials(item.friendUser.name)}
+        className="size-12"
+      />
       <View className="flex-1">
-        <Text className="font-semibold text-foreground">{item.friendUser.name}</Text>
-        <Text className="text-sm text-muted-foreground">Requested · {requestedAgo}</Text>
+        <Text className="font-semibold text-foreground">
+          {item.friendUser.name}
+        </Text>
+        <Text className="text-sm text-muted-foreground">
+          Requested · {requestedAgo}
+        </Text>
       </View>
       <Button variant="outline" size="sm" onPress={onCancel}>
         <Text>Cancel</Text>
@@ -131,11 +128,21 @@ function FriendItem({
 }) {
   return (
     <View className="flex-row items-center gap-3 px-4 py-3">
-      <UserAvatar user={item.friendUser} />
+      <Avatar
+        source={
+          item.friendUser.image ? { uri: item.friendUser.image } : undefined
+        }
+        alt={getInitials(item.friendUser.name)}
+        className="size-12"
+      />
       <View className="flex-1">
-        <Text className="font-semibold text-foreground">{item.friendUser.name}</Text>
+        <Text className="font-semibold text-foreground">
+          {item.friendUser.name}
+        </Text>
         {item.weeklyRank != null && (
-          <Text className="text-sm text-muted-foreground">#{item.weeklyRank} this week</Text>
+          <Text className="text-sm text-muted-foreground">
+            #{item.weeklyRank} this week
+          </Text>
         )}
       </View>
       <Button variant="ghost" size="icon" onPress={onMenu}>
@@ -156,30 +163,34 @@ function SearchResultItem({
 }) {
   return (
     <View className="flex-row items-center gap-3 px-4 py-3">
-      <UserAvatar user={user} />
+      <Avatar
+        source={user.image ? { uri: user.image } : undefined}
+        alt={getInitials(user.name)}
+        className="size-12"
+      />
       <Text className="flex-1 font-semibold text-foreground">{user.name}</Text>
       <Button size="sm" onPress={onSendRequest} disabled={isPending}>
-        <Text>{isPending ? 'Sending…' : 'Add'}</Text>
+        <Text>{isPending ? "Sending…" : "Add"}</Text>
       </Button>
     </View>
   );
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
-
 export function FriendsScreen() {
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [pendingSendIds, setPendingSendIds] = useState<Set<string>>(new Set());
 
   const { data, isLoading } = useQuery<FriendsData>({
-    queryKey: FRIENDS_QUERY_KEY,
+    queryKey: ["friends"],
     queryFn: getFriends,
   });
 
-  const { data: searchResults, isFetching: isSearching } = useQuery<FriendUser[]>({
-    queryKey: ['user-search', searchQuery],
+  const { data: searchResults, isFetching: isSearching } = useQuery<
+    FriendUser[]
+  >({
+    queryKey: ["user-search", searchQuery],
     queryFn: () => searchUsers(searchQuery),
     enabled: searchQuery.length >= 2,
     staleTime: 30_000,
@@ -188,13 +199,15 @@ export function FriendsScreen() {
   const acceptMutation = useMutation({
     mutationFn: acceptFriendRequest,
     onSuccess: (newFriend) => {
-      queryClient.cancelQueries({ queryKey: FRIENDS_QUERY_KEY });
-      queryClient.setQueryData<FriendsData>(FRIENDS_QUERY_KEY, (old) => {
+      queryClient.cancelQueries({ queryKey: ["friends"] });
+      queryClient.setQueryData<FriendsData>(["friends"], (old) => {
         if (!old) return old;
         return {
           ...old,
           friends: [...old.friends, newFriend],
-          requestsReceived: old.requestsReceived.filter((r) => r.id !== newFriend.id),
+          requestsReceived: old.requestsReceived.filter(
+            (r) => r.id !== newFriend.id,
+          ),
         };
       });
     },
@@ -203,12 +216,14 @@ export function FriendsScreen() {
   const declineMutation = useMutation({
     mutationFn: declineFriendRequest,
     onSuccess: (_, friendId) => {
-      queryClient.cancelQueries({ queryKey: FRIENDS_QUERY_KEY });
-      queryClient.setQueryData<FriendsData>(FRIENDS_QUERY_KEY, (old) => {
+      queryClient.cancelQueries({ queryKey: ["friends"] });
+      queryClient.setQueryData<FriendsData>(["friends"], (old) => {
         if (!old) return old;
         return {
           ...old,
-          requestsReceived: old.requestsReceived.filter((r) => r.id !== friendId),
+          requestsReceived: old.requestsReceived.filter(
+            (r) => r.id !== friendId,
+          ),
         };
       });
     },
@@ -217,8 +232,8 @@ export function FriendsScreen() {
   const cancelMutation = useMutation({
     mutationFn: deleteFriend,
     onSuccess: (_, friendId) => {
-      queryClient.cancelQueries({ queryKey: FRIENDS_QUERY_KEY });
-      queryClient.setQueryData<FriendsData>(FRIENDS_QUERY_KEY, (old) => {
+      queryClient.cancelQueries({ queryKey: ["friends"] });
+      queryClient.setQueryData<FriendsData>(["friends"], (old) => {
         if (!old) return old;
         return {
           ...old,
@@ -234,8 +249,8 @@ export function FriendsScreen() {
       setPendingSendIds((prev) => new Set([...prev, addresseeId]));
     },
     onSuccess: (newRequest) => {
-      queryClient.cancelQueries({ queryKey: FRIENDS_QUERY_KEY });
-      queryClient.setQueryData<FriendsData>(FRIENDS_QUERY_KEY, (old) => {
+      queryClient.cancelQueries({ queryKey: ["friends"] });
+      queryClient.setQueryData<FriendsData>(["friends"], (old) => {
         if (!old) return old;
         return {
           ...old,
@@ -247,7 +262,7 @@ export function FriendsScreen() {
         next.delete(newRequest.addresseeId);
         return next;
       });
-      setSearchQuery('');
+      setSearchQuery("");
     },
     onError: (_, addresseeId) => {
       setPendingSendIds((prev) => {
@@ -307,9 +322,13 @@ export function FriendsScreen() {
               <ActivityIndicator />
             </View>
           )}
-          {!isSearching && filteredSearchResults && filteredSearchResults.length === 0 && (
-            <Text className="px-4 py-3 text-sm text-muted-foreground">No users found</Text>
-          )}
+          {!isSearching &&
+            filteredSearchResults &&
+            filteredSearchResults.length === 0 && (
+              <Text className="px-4 py-3 text-sm text-muted-foreground">
+                No users found
+              </Text>
+            )}
           {!isSearching &&
             filteredSearchResults?.map((u) => (
               <SearchResultItem
@@ -379,7 +398,9 @@ export function FriendsScreen() {
         (data?.requestsReceived.length ?? 0) === 0 &&
         (data?.requestsSent.length ?? 0) === 0 && (
           <View className="items-center px-8 pt-16 gap-2">
-            <Text className="text-base font-semibold text-foreground">No friends yet</Text>
+            <Text className="text-base font-semibold text-foreground">
+              No friends yet
+            </Text>
             <Text className="text-sm text-center text-muted-foreground">
               Search for friends by name to get started.
             </Text>
@@ -389,7 +410,6 @@ export function FriendsScreen() {
   );
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function formatRequestedAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();

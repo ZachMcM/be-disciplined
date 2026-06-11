@@ -1,24 +1,31 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Text } from '@/components/ui/text';
-import { authClient } from '@/lib/auth-client';
-import { patchUserName } from '@/lib/endpoints';
-import { cn } from '@/lib/utils';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
-import { Controller, useForm } from 'react-hook-form';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-native';
-import { toast } from 'sonner-native';
-import * as z from 'zod';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Text } from "@/components/ui/text";
+import { authClient } from "@/lib/auth-client";
+import { patchUserName } from "@/lib/endpoints";
+import { cn } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { Controller, useForm } from "react-hook-form";
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  View,
+} from "react-native";
+import { toast } from "sonner-native";
+import * as z from "zod";
 
 const NameSchema = z.object({
-  firstName: z.string().min(1, 'First name is required'),
-  lastName: z.string().min(1, 'Last name is required'),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
 });
 
 type NameFormValues = z.infer<typeof NameSchema>;
 
 export default function NameOnboardingScreen() {
+  const { refetch: refetchAuthClient } = authClient.useSession();
+
   const {
     control,
     handleSubmit,
@@ -31,23 +38,30 @@ export default function NameOnboardingScreen() {
     mutationFn: ({ firstName, lastName }: NameFormValues) =>
       patchUserName(`${firstName} ${lastName}`),
     onSuccess: async () => {
-      await authClient.getSession({ fetchOptions: { cache: 'no-cache' } });
+      refetchAuthClient();
+      toast.success("Height saved!", { position: "bottom-center" });
     },
     onError: (error) => {
-      toast.error(error.message ?? 'Something went wrong', { position: 'bottom-center' });
+      toast.error(error.message ?? "Something went wrong", {
+        position: "bottom-center",
+      });
     },
   });
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      className="flex-1 items-center bg-background">
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      className="flex-1 items-center bg-background"
+    >
       <View className="flex w-full flex-col items-center gap-4 p-8">
         <View className="flex w-full flex-col gap-1">
-          <Text className="text-xl font-bold">What's your name?</Text>
-          <Text variant="muted">This helps others find and identify you.</Text>
+          <Text className="text-xl font-bold text-center">
+            What's your name?
+          </Text>
+          <Text className="text-center" variant="muted">
+            This helps others find and identify you.
+          </Text>
         </View>
-
         <View className="flex w-full flex-row gap-2">
           <Controller
             control={control}
@@ -60,7 +74,10 @@ export default function NameOnboardingScreen() {
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
-                  className={cn(errors.firstName && 'border-destructive', 'rounded-full')}
+                  className={cn(
+                    errors.firstName && "border-destructive",
+                    "rounded-full",
+                  )}
                   autoCapitalize="words"
                   textContentType="givenName"
                   returnKeyType="next"
@@ -83,7 +100,10 @@ export default function NameOnboardingScreen() {
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
-                  className={cn(errors.lastName && 'border-destructive', 'rounded-full')}
+                  className={cn(
+                    errors.lastName && "border-destructive",
+                    "rounded-full",
+                  )}
                   autoCapitalize="words"
                   textContentType="familyName"
                   returnKeyType="done"
@@ -103,9 +123,15 @@ export default function NameOnboardingScreen() {
           className="w-full"
           size="lg"
           disabled={isPending}
-          onPress={handleSubmit((values) => mutate(values))}>
+          onPress={handleSubmit((values) => mutate(values))}
+        >
           <Text>Continue</Text>
-          {isPending && <ActivityIndicator size="small" className="text-primary-foreground" />}
+          {isPending && (
+            <ActivityIndicator
+              size="small"
+              className="text-primary-foreground"
+            />
+          )}
         </Button>
       </View>
     </KeyboardAvoidingView>
