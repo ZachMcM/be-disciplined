@@ -1,6 +1,6 @@
 import { DarkTheme, DefaultTheme } from "expo-router";
 
-// Default React Native Reusables (neutral) theme — kept in sync with global.css.
+// Navigation + toast colors for expo-router/sonner. App UI colors live in `unistyles.ts`.
 export const THEME = {
   light: {
     background: "hsl(224 0% 100%)",

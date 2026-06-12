@@ -1,4 +1,4 @@
-import '@/global.css';
+import '@/unistyles';
 
 import { InvalidationProvider } from '@/components/providers/InvalidationProvider';
 import { useNotificationObserver, usePushTokenRegistration } from '@/hooks/usePushNotifications';
@@ -9,7 +9,6 @@ import { PortalHost } from '@rn-primitives/portal';
 import { focusManager, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack, ThemeProvider } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useColorScheme } from 'nativewind';
 import { useEffect } from 'react';
 import type { AppStateStatus } from 'react-native';
 import { AppState, Platform } from 'react-native';
@@ -27,33 +26,25 @@ function onAppStateChange(status: AppStateStatus) {
 }
 
 export default function RootLayout() {
-  const { colorScheme, setColorScheme } = useColorScheme();
-
-  useEffect(() => {
-    setColorScheme('system');
-  }, []);
-
   useEffect(() => {
     const subscription = AppState.addEventListener('change', onAppStateChange);
     return () => subscription.remove();
   }, []);
 
-  const scheme = colorScheme ?? 'light';
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider value={NAV_THEME[scheme]}>
+        <ThemeProvider value={NAV_THEME.dark}>
           <BottomSheetModalProvider>
             <InvalidationProvider>
-              <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+              <StatusBar style="light" />
               <RootNavigator />
             </InvalidationProvider>
             <Toaster
               toastOptions={{
                 style: {
-                  backgroundColor: THEME[scheme].card,
-                  borderColor: THEME[scheme].border,
+                  backgroundColor: THEME.dark.card,
+                  borderColor: THEME.dark.border,
                   borderWidth: 1,
                 },
               }}

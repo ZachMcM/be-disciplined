@@ -1,14 +1,10 @@
 import { THEME } from "@/lib/theme";
 import { router } from "expo-router";
 import { NativeTabs } from "expo-router/unstable-native-tabs";
-import { useColorScheme } from "nativewind";
 
 export default function TabsLayout() {
-  const { colorScheme } = useColorScheme();
-  const theme = THEME[colorScheme ?? "light"];
-
   return (
-    <NativeTabs tintColor={theme.primary}>
+    <NativeTabs tintColor={THEME.dark.primary}>
       <NativeTabs.Trigger name="(home)">
         <NativeTabs.Trigger.Label hidden>Home</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="house.fill" md="home" />

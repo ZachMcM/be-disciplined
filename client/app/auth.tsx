@@ -4,12 +4,12 @@ import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { useCountdown } from '@/hooks/useCountdown';
 import { authClient } from '@/lib/auth-client';
-import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeftIcon } from 'lucide-react-native';
 import { Fragment, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { toast } from 'sonner-native';
 import * as z from 'zod';
 
@@ -17,7 +17,66 @@ const EmailSchema = z.object({
   email: z.email(),
 });
 
+const styles = StyleSheet.create((theme) => ({
+  screen: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: theme.colors.background,
+  },
+  container: {
+    width: '100%',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 16,
+    padding: 32,
+  },
+  title: {
+    fontSize: 20,
+    lineHeight: 28,
+    fontWeight: '700',
+  },
+  field: {
+    width: '100%',
+    flexDirection: 'column',
+    gap: 8,
+  },
+  inputRounded: {
+    borderRadius: theme.radius.full,
+  },
+  inputError: {
+    borderColor: theme.colors.destructive,
+  },
+  errorText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: theme.colors.destructive,
+  },
+  disclaimer: {
+    textAlign: 'center',
+    fontSize: 12,
+    fontWeight: '500',
+    color: theme.colors.mutedForeground,
+  },
+  fullWidth: {
+    width: '100%',
+  },
+  resendText: {
+    textAlign: 'center',
+    fontSize: 12,
+  },
+  row: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  flex1: {
+    flex: 1,
+  },
+}));
+
 export default function AuthPage() {
+  const { theme } = useUnistyles();
   const [isPending, setIsPending] = useState(false);
   const { countdown, restartCountdown } = useCountdown(30);
   const [step, setStep] = useState<0 | 1>(0);
@@ -61,22 +120,22 @@ export default function AuthPage() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      className="flex-1 items-center bg-background">
-      <View className="flex w-full flex-col items-center gap-4 p-8">
+      style={styles.screen}>
+      <View style={styles.container}>
         {step === 0 ? (
           <Fragment>
-            <Text className="text-xl font-bold">What's your email?</Text>
+            <Text style={styles.title}>What's your email?</Text>
             <Controller
               control={emailControl}
               rules={{ required: true }}
               render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-                <View className="flex w-full flex-col gap-2">
+                <View style={styles.field}>
                   <Input
                     autoFocus
                     placeholder="johndoe@example.com"
                     onBlur={onBlur}
                     onChangeText={onChange}
-                    className={cn(error && 'border-destructive', 'rounded-full')}
+                    style={[styles.inputRounded, error && styles.inputError]}
                     textContentType="emailAddress"
                     autoComplete="email"
                     autoCapitalize="none"
@@ -84,23 +143,21 @@ export default function AuthPage() {
                     onSubmitEditing={handleEmailSubmit(onSubmitEmail)}
                     keyboardType="email-address"
                   />
-                  {error && (
-                    <Text className="text-sm font-medium text-destructive">{error.message}</Text>
-                  )}
+                  {error && <Text style={styles.errorText}>{error.message}</Text>}
                 </View>
               )}
               name="email"
             />
-            <Text className="text-center text-xs font-medium text-muted-foreground">
+            <Text style={styles.disclaimer}>
               By continuing, you agree to our Privacy Policy and Terms of Service
             </Text>
-            <Button className="w-full" size="lg" onPress={handleEmailSubmit(onSubmitEmail)}>
+            <Button style={styles.fullWidth} size="lg" onPress={handleEmailSubmit(onSubmitEmail)}>
               <Text>Continue</Text>
             </Button>
           </Fragment>
         ) : (
           <Fragment>
-            <Text className="text-xl font-bold">Verify your email</Text>
+            <Text style={styles.title}>Verify your email</Text>
             <Input
               value={otp}
               onChangeText={setOtp}
@@ -112,7 +169,7 @@ export default function AuthPage() {
               autoComplete="sms-otp"
               textContentType="oneTimeCode"
               onSubmitEditing={onSubmitOtp}
-              className="rounded-full"
+              style={styles.inputRounded}
             />
             <Button
               variant="link"
@@ -122,23 +179,21 @@ export default function AuthPage() {
                 sendOTP(email);
                 restartCountdown();
               }}>
-              <Text className="text-center text-xs">
+              <Text style={styles.resendText}>
                 Didn't receive the code? Resend{' '}
-                {countdown > 0 ? <Text className="text-xs">({countdown})</Text> : null}
+                {countdown > 0 ? <Text style={styles.resendText}>({countdown})</Text> : null}
               </Text>
             </Button>
-            <View className="flex w-full flex-row items-center gap-2">
-              <Button
-                variant="outline"
-                onPress={() => setStep(0)}
-                size="lg"
-                className="flex-1">
+            <View style={styles.row}>
+              <Button variant="outline" onPress={() => setStep(0)} size="lg" style={styles.flex1}>
                 <Icon as={ArrowLeftIcon} size={18} />
                 <Text>Back</Text>
               </Button>
-              <Button className="flex-1" disabled={isPending} onPress={onSubmitOtp} size="lg">
+              <Button style={styles.flex1} disabled={isPending} onPress={onSubmitOtp} size="lg">
                 <Text>Continue</Text>
-                {isPending && <ActivityIndicator size="small" className="text-primary-foreground" />}
+                {isPending && (
+                  <ActivityIndicator size="small" color={theme.colors.primaryForeground} />
+                )}
               </Button>
             </View>
           </Fragment>

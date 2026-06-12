@@ -1,30 +1,38 @@
-import { cn } from '@/lib/utils';
-import { Platform, TextInput, type TextInputProps } from 'react-native';
+import { TextInput, type TextInputProps } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
-function Input({
-  className,
-  placeholderClassName,
-  ...props
-}: TextInputProps & React.RefAttributes<TextInput> & { placeholderClassName?: string }) {
+const styles = StyleSheet.create((theme) => ({
+  input: {
+    height: 40,
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: theme.radius['2xl'],
+    borderWidth: 1,
+    borderColor: theme.colors.input,
+    backgroundColor: theme.colors.background,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    fontSize: 16,
+    lineHeight: 20,
+    color: theme.colors.foreground,
+    variants: {
+      disabled: {
+        true: { opacity: 0.5 },
+        false: {},
+      },
+    },
+  },
+}));
+
+function Input({ style, editable, ...props }: TextInputProps) {
+  const { theme } = useUnistyles();
+  styles.useVariants({ disabled: editable === false });
   return (
     <TextInput
-      className={cn(
-        'flex h-10 w-full min-w-0 flex-row items-center rounded-2xl border border-input bg-background px-3 py-1 text-base leading-5 text-foreground shadow-sm shadow-black/5 dark:bg-input/30 sm:h-9',
-        props.editable === false &&
-          cn(
-            'opacity-50',
-            Platform.select({ web: 'disabled:pointer-events-none disabled:cursor-not-allowed' })
-          ),
-        Platform.select({
-          web: cn(
-            'outline-none transition-[color,box-shadow] selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground md:text-sm',
-            'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
-            'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive'
-          ),
-          native: 'placeholder:text-muted-foreground/50',
-        }),
-        className
-      )}
+      editable={editable}
+      placeholderTextColor={theme.colors.mutedForeground}
+      style={[styles.input, style]}
       {...props}
     />
   );

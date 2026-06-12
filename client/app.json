@@ -30,7 +30,8 @@
           "photosPermission": "Allow Be Disciplined to access your photos to set a profile picture.",
           "cameraPermission": "Allow Be Disciplined to use your camera to take a profile picture."
         }
-      ]
+      ],
+      "react-native-edge-to-edge"
     ],
     "experiments": {
       "typedRoutes": true

@@ -1,108 +1,95 @@
-import { TextClassContext } from '@/components/ui/text';
-import { cn } from '@/lib/utils';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { Platform, Pressable } from 'react-native';
+import { Pressable, type PressableProps, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, type UnistylesVariants } from 'react-native-unistyles';
+import { TextStyleContext } from './text';
 
-const buttonVariants = cva(
-  cn(
-    'group shrink-0 flex-row items-center justify-center gap-2 rounded-full shadow-none',
-    Platform.select({
-      web: "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive whitespace-nowrap outline-none transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
-    })
-  ),
-  {
+const styles = StyleSheet.create((theme) => ({
+  base: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    flexShrink: 0,
+    borderRadius: theme.radius.full,
     variants: {
       variant: {
-        default: cn(
-          'bg-primary shadow-sm shadow-black/5 active:bg-primary/90',
-          Platform.select({ web: 'hover:bg-primary/90' })
-        ),
-        destructive: cn(
-          'bg-destructive/20',
-          Platform.select({
-            web: 'hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40',
-          })
-        ),
-        outline: cn(
-          'border border-border bg-background shadow-sm shadow-black/5 active:bg-accent dark:border-input dark:bg-input/30 dark:active:bg-input/50',
-          Platform.select({
-            web: 'hover:bg-accent dark:hover:bg-input/50',
-          })
-        ),
-        secondary: cn(
-          'bg-secondary shadow-sm shadow-black/5 active:bg-secondary/80',
-          Platform.select({ web: 'hover:bg-secondary/80' })
-        ),
-        ghost: cn(
-          'active:bg-accent dark:active:bg-accent/50',
-          Platform.select({ web: 'hover:bg-accent dark:hover:bg-accent/50' })
-        ),
-        link: '',
+        default: { backgroundColor: theme.colors.primary },
+        // destructive surface = destructive @ 20% opacity
+        destructive: { backgroundColor: '#ff656833' },
+        outline: {
+          borderWidth: 1,
+          borderColor: theme.colors.border,
+          backgroundColor: theme.colors.background,
+        },
+        secondary: { backgroundColor: theme.colors.secondary },
+        ghost: { backgroundColor: 'transparent' },
+        link: { backgroundColor: 'transparent' },
       },
       size: {
-        default: cn('h-10 px-4 py-2 sm:h-9', Platform.select({ web: 'has-[>svg]:px-3' })),
-        sm: cn('h-9 gap-1.5 px-3 sm:h-8', Platform.select({ web: 'has-[>svg]:px-2.5' })),
-        lg: cn('h-11 px-6 sm:h-10', Platform.select({ web: 'has-[>svg]:px-4' })),
-        icon: 'h-10 w-10 sm:h-9 sm:w-9',
+        default: { height: 40, paddingHorizontal: 16, paddingVertical: 8 },
+        sm: { height: 36, paddingHorizontal: 12, gap: 6 },
+        lg: { height: 44, paddingHorizontal: 24 },
+        icon: { height: 40, width: 40 },
       },
     },
-    defaultVariants: {
-      variant: 'default',
-      size: 'default',
-    },
-  }
-);
-
-const buttonTextVariants = cva(
-  cn(
-    'text-sm font-semibold text-foreground',
-    Platform.select({ web: 'pointer-events-none transition-colors' })
-  ),
-  {
+  },
+  disabled: {
+    opacity: 0.5,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
     variants: {
       variant: {
-        default: 'text-primary-foreground',
-        destructive: 'text-destructive',
-        outline: cn(
-          'group-active:text-accent-foreground',
-          Platform.select({ web: 'group-hover:text-accent-foreground' })
-        ),
-        secondary: 'text-secondary-foreground',
-        ghost: 'group-active:text-accent-foreground',
-        link: cn(
-          'text-foreground group-active:underline',
-          Platform.select({ web: 'underline-offset-4 hover:underline group-hover:underline' })
-        ),
+        default: { color: theme.colors.primaryForeground },
+        destructive: { color: theme.colors.destructive },
+        outline: { color: theme.colors.foreground },
+        secondary: { color: theme.colors.secondaryForeground },
+        ghost: { color: theme.colors.foreground },
+        link: { color: theme.colors.foreground, textDecorationLine: 'underline' },
       },
       size: {
-        default: '',
-        sm: '',
-        lg: '',
-        icon: '',
+        default: {},
+        sm: {},
+        lg: {},
+        icon: {},
       },
     },
-    defaultVariants: {
-      variant: 'default',
-      size: 'default',
-    },
-  }
-);
+  },
+}));
 
-type ButtonProps = React.ComponentProps<typeof Pressable> &
-  React.RefAttributes<typeof Pressable> &
-  VariantProps<typeof buttonVariants>;
+// Per-variant press feedback — dark-mode values from the original `active:*` classes.
+const pressedStyles = StyleSheet.create((theme) => ({
+  default: { backgroundColor: '#e5e5e5e6' }, // primary @ 90%
+  destructive: { backgroundColor: '#ff656550' }, // destructive surface, pressed
+  outline: { backgroundColor: '#34343480' }, // input @ 50%
+  secondary: { backgroundColor: '#262626cc' }, // secondary @ 80%
+  ghost: { backgroundColor: theme.colors.accent + '80' }, // accent @ 50%
+  link: {},
+}));
 
-function Button({ className, variant, size, ...props }: ButtonProps) {
+type ButtonProps = Omit<PressableProps, 'style'> &
+  UnistylesVariants<typeof styles> & {
+    style?: StyleProp<ViewStyle>;
+  };
+
+function Button({ variant, size, style, disabled, ...props }: ButtonProps) {
+  styles.useVariants({ variant, size });
   return (
-    <TextClassContext.Provider value={buttonTextVariants({ variant, size })}>
+    <TextStyleContext.Provider value={styles.label}>
       <Pressable
-        className={cn(props.disabled && 'opacity-50', buttonVariants({ variant, size }), className)}
         role="button"
+        disabled={disabled}
+        style={({ pressed }) => [
+          styles.base,
+          pressed && pressedStyles[variant ?? 'default'],
+          disabled && styles.disabled,
+          style,
+        ]}
         {...props}
       />
-    </TextClassContext.Provider>
+    </TextStyleContext.Provider>
   );
 }
 
-export { Button, buttonTextVariants, buttonVariants };
+export { Button };
 export type { ButtonProps };
