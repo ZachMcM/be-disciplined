@@ -1,11 +1,35 @@
-import { cn } from '@/lib/utils';
-import { View } from 'react-native';
+import { useEffect } from 'react';
+import { type StyleProp, type ViewStyle } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
+import { StyleSheet } from 'react-native-unistyles';
 
-function Skeleton({
-  className,
-  ...props
-}: React.ComponentProps<typeof View> & React.RefAttributes<View>) {
-  return <View className={cn('bg-accent animate-pulse rounded-md', className)} {...props} />;
+const styles = StyleSheet.create((theme) => ({
+  base: {
+    backgroundColor: theme.colors.accent,
+    borderRadius: theme.radius.md,
+  },
+}));
+
+function Skeleton({ style }: { style?: StyleProp<ViewStyle> }) {
+  const opacity = useSharedValue(0.5);
+
+  useEffect(() => {
+    opacity.value = withRepeat(
+      withSequence(withTiming(1, { duration: 800 }), withTiming(0.5, { duration: 800 })),
+      -1,
+      true
+    );
+  }, [opacity]);
+
+  const animatedStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
+
+  return <Animated.View style={[styles.base, animatedStyle, style]} />;
 }
 
 export { Skeleton };

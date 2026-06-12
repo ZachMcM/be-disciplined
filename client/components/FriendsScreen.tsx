@@ -1,5 +1,6 @@
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Text } from "@/components/ui/text";
@@ -18,18 +19,116 @@ import { getInitials } from "@/lib/utils";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { Check, MoreHorizontal, X } from "lucide-react-native";
 import { useCallback, useState } from "react";
-import { ActivityIndicator, FlatList, ScrollView, View } from "react-native";
+import { ActivityIndicator, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
+
+const styles = StyleSheet.create((theme) => ({
+  screen: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  centerScreen: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: theme.colors.background,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 8,
+  },
+  sectionTitle: {
+    fontSize: 12,
+    fontWeight: "600",
+    letterSpacing: 1.2,
+    textTransform: "uppercase",
+    color: theme.colors.mutedForeground,
+  },
+  badge: {
+    height: 20,
+    minWidth: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 6,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.destructive,
+  },
+  badgeText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#ffffff",
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  flex1: {
+    flex: 1,
+  },
+  name: {
+    fontWeight: "600",
+    color: theme.colors.foreground,
+  },
+  meta: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: theme.colors.mutedForeground,
+  },
+  actions: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  searchBar: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+  loadingRow: {
+    alignItems: "center",
+    paddingVertical: 16,
+  },
+  emptyText: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 14,
+    color: theme.colors.mutedForeground,
+  },
+  separatorSpacing: {
+    marginTop: 8,
+  },
+  emptyState: {
+    alignItems: "center",
+    paddingHorizontal: 32,
+    paddingTop: 64,
+    gap: 8,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: theme.colors.foreground,
+  },
+  emptyDesc: {
+    fontSize: 14,
+    textAlign: "center",
+    color: theme.colors.mutedForeground,
+  },
+}));
 
 function SectionHeader({ title, badge }: { title: string; badge?: number }) {
   return (
-    <View className="flex-row items-center justify-between px-4 pt-5 pb-2">
-      <Text className="text-xs font-semibold tracking-widest text-muted-foreground uppercase">
-        {title}
-      </Text>
+    <View style={styles.sectionHeader}>
+      <Text style={styles.sectionTitle}>{title}</Text>
       {badge != null && badge > 0 && (
-        <View className="bg-destructive h-5 min-w-5 items-center justify-center rounded-full px-1.5">
-          <Text className="text-xs font-bold text-white">{badge}</Text>
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>{badge}</Text>
         </View>
       )}
     </View>
@@ -46,41 +145,29 @@ function RequestItem({
   onDecline: () => void;
 }) {
   return (
-    <View className="flex-row items-center gap-3 px-4 py-3">
+    <View style={styles.row}>
       <Avatar
         source={
           item.friendUser.image ? { uri: item.friendUser.image } : undefined
         }
         alt={getInitials(item.friendUser.name)}
-        className="size-12"
+        size={48}
       />
-      <View className="flex-1">
-        <Text className="font-semibold text-foreground">
-          {item.friendUser.name}
-        </Text>
+      <View style={styles.flex1}>
+        <Text style={styles.name}>{item.friendUser.name}</Text>
         {item.mutualFriendCount > 0 && (
-          <Text className="text-sm text-muted-foreground">
+          <Text style={styles.meta}>
             {item.mutualFriendCount} mutual{" "}
             {item.mutualFriendCount === 1 ? "friend" : "friends"}
           </Text>
         )}
       </View>
-      <View className="flex-row gap-2">
-        <Button
-          variant="outline"
-          size="icon"
-          className="rounded-full"
-          onPress={onAccept}
-        >
-          <Check className="text-foreground" size={18} />
+      <View style={styles.actions}>
+        <Button variant="outline" size="icon" onPress={onAccept}>
+          <Icon as={Check} size={18} />
         </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          className="rounded-full"
-          onPress={onDecline}
-        >
-          <X className="text-foreground" size={18} />
+        <Button variant="outline" size="icon" onPress={onDecline}>
+          <Icon as={X} size={18} />
         </Button>
       </View>
     </View>
@@ -96,21 +183,17 @@ function SentRequestItem({
 }) {
   const requestedAgo = formatRequestedAgo(item.createdAt);
   return (
-    <View className="flex-row items-center gap-3 px-4 py-3">
+    <View style={styles.row}>
       <Avatar
         source={
           item.friendUser.image ? { uri: item.friendUser.image } : undefined
         }
         alt={getInitials(item.friendUser.name)}
-        className="size-12"
+        size={48}
       />
-      <View className="flex-1">
-        <Text className="font-semibold text-foreground">
-          {item.friendUser.name}
-        </Text>
-        <Text className="text-sm text-muted-foreground">
-          Requested · {requestedAgo}
-        </Text>
+      <View style={styles.flex1}>
+        <Text style={styles.name}>{item.friendUser.name}</Text>
+        <Text style={styles.meta}>Requested · {requestedAgo}</Text>
       </View>
       <Button variant="outline" size="sm" onPress={onCancel}>
         <Text>Cancel</Text>
@@ -126,27 +209,24 @@ function FriendItem({
   item: FriendRecord;
   onMenu: () => void;
 }) {
+  const { theme } = useUnistyles();
   return (
-    <View className="flex-row items-center gap-3 px-4 py-3">
+    <View style={styles.row}>
       <Avatar
         source={
           item.friendUser.image ? { uri: item.friendUser.image } : undefined
         }
         alt={getInitials(item.friendUser.name)}
-        className="size-12"
+        size={48}
       />
-      <View className="flex-1">
-        <Text className="font-semibold text-foreground">
-          {item.friendUser.name}
-        </Text>
+      <View style={styles.flex1}>
+        <Text style={styles.name}>{item.friendUser.name}</Text>
         {item.weeklyRank != null && (
-          <Text className="text-sm text-muted-foreground">
-            #{item.weeklyRank} this week
-          </Text>
+          <Text style={styles.meta}>#{item.weeklyRank} this week</Text>
         )}
       </View>
       <Button variant="ghost" size="icon" onPress={onMenu}>
-        <MoreHorizontal className="text-muted-foreground" size={20} />
+        <Icon as={MoreHorizontal} size={20} color={theme.colors.mutedForeground} />
       </Button>
     </View>
   );
@@ -162,13 +242,13 @@ function SearchResultItem({
   isPending: boolean;
 }) {
   return (
-    <View className="flex-row items-center gap-3 px-4 py-3">
+    <View style={styles.row}>
       <Avatar
         source={user.image ? { uri: user.image } : undefined}
         alt={getInitials(user.name)}
-        className="size-12"
+        size={48}
       />
-      <Text className="flex-1 font-semibold text-foreground">{user.name}</Text>
+      <Text style={[styles.flex1, styles.name]}>{user.name}</Text>
       <Button size="sm" onPress={onSendRequest} disabled={isPending}>
         <Text>{isPending ? "Sending…" : "Add"}</Text>
       </Button>
@@ -289,7 +369,7 @@ export function FriendsScreen() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-background">
+      <View style={styles.centerScreen}>
         <ActivityIndicator />
       </View>
     );
@@ -297,13 +377,12 @@ export function FriendsScreen() {
 
   return (
     <ScrollView
-      className="flex-1 bg-background"
-      contentContainerClassName="pb-8"
+      style={styles.screen}
       contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
       keyboardShouldPersistTaps="handled"
     >
       {/* Search bar */}
-      <View className="px-4 pt-4 pb-2">
+      <View style={styles.searchBar}>
         <Input
           placeholder="Add by username..."
           value={searchQuery}
@@ -317,16 +396,14 @@ export function FriendsScreen() {
       {isSearchMode && (
         <>
           {isSearching && (
-            <View className="items-center py-4">
+            <View style={styles.loadingRow}>
               <ActivityIndicator />
             </View>
           )}
           {!isSearching &&
             filteredSearchResults &&
             filteredSearchResults.length === 0 && (
-              <Text className="px-4 py-3 text-sm text-muted-foreground">
-                No users found
-              </Text>
+              <Text style={styles.emptyText}>No users found</Text>
             )}
           {!isSearching &&
             filteredSearchResults?.map((u) => (
@@ -337,7 +414,7 @@ export function FriendsScreen() {
                 onSendRequest={() => sendRequestMutation.mutate(u.id)}
               />
             ))}
-          <Separator className="mt-2" />
+          <Separator style={styles.separatorSpacing} />
         </>
       )}
 
@@ -356,7 +433,7 @@ export function FriendsScreen() {
               onDecline={() => declineMutation.mutate(item.id)}
             />
           ))}
-          <Separator className="mt-2" />
+          <Separator style={styles.separatorSpacing} />
         </>
       )}
 
@@ -371,7 +448,7 @@ export function FriendsScreen() {
               onCancel={() => cancelMutation.mutate(item.id)}
             />
           ))}
-          <Separator className="mt-2" />
+          <Separator style={styles.separatorSpacing} />
         </>
       )}
 
@@ -396,11 +473,9 @@ export function FriendsScreen() {
         (data?.friends.length ?? 0) === 0 &&
         (data?.requestsReceived.length ?? 0) === 0 &&
         (data?.requestsSent.length ?? 0) === 0 && (
-          <View className="items-center px-8 pt-16 gap-2">
-            <Text className="text-base font-semibold text-foreground">
-              No friends yet
-            </Text>
-            <Text className="text-sm text-center text-muted-foreground">
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyTitle}>No friends yet</Text>
+            <Text style={styles.emptyDesc}>
               Search for friends by name to get started.
             </Text>
           </View>
@@ -408,7 +483,6 @@ export function FriendsScreen() {
     </ScrollView>
   );
 }
-
 
 function formatRequestedAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();

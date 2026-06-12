@@ -1,84 +1,113 @@
-import { cn } from '@/lib/utils';
 import * as Slot from '@rn-primitives/slot';
-import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
-import { Platform, Text as RNText, type Role } from 'react-native';
+import { Text as RNText, type Role, type StyleProp, type TextStyle } from 'react-native';
+import { StyleSheet, type UnistylesVariants } from 'react-native-unistyles';
 
-const textVariants = cva(
-  cn(
-    'text-base text-foreground',
-    Platform.select({
-      web: 'select-text',
-    })
-  ),
-  {
+const styles = StyleSheet.create((theme) => ({
+  text: {
+    color: theme.colors.foreground,
+    fontSize: 16,
+    lineHeight: 24,
     variants: {
       variant: {
-        default: '',
-        h1: cn(
-          'text-center text-4xl font-extrabold tracking-tight',
-          Platform.select({ web: 'scroll-m-20 text-balance' })
-        ),
-        h2: cn(
-          'border-b border-border pb-2 text-3xl font-semibold tracking-tight',
-          Platform.select({ web: 'scroll-m-20 first:mt-0' })
-        ),
-        h3: cn('text-2xl font-semibold tracking-tight', Platform.select({ web: 'scroll-m-20' })),
-        h4: cn('text-xl font-semibold tracking-tight', Platform.select({ web: 'scroll-m-20' })),
-        p: 'mt-3 leading-7 sm:mt-6',
-        blockquote: 'mt-4 border-l-2 pl-3 italic sm:mt-6 sm:pl-6',
-        code: cn(
-          'relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold'
-        ),
-        lead: 'text-xl text-muted-foreground',
-        large: 'text-lg font-semibold',
-        small: 'text-sm font-medium leading-none',
-        muted: 'text-sm text-muted-foreground',
+        default: {},
+        h1: {
+          ...theme.typography['4xl'],
+          fontWeight: '800',
+          letterSpacing: -0.5,
+          textAlign: 'center',
+        },
+        h2: {
+          ...theme.typography['3xl'],
+          fontWeight: '600',
+          letterSpacing: -0.5,
+          paddingBottom: 8,
+          borderBottomWidth: 1,
+          borderColor: theme.colors.border,
+        },
+        h3: {
+          ...theme.typography['2xl'],
+          fontWeight: '600',
+          letterSpacing: -0.5,
+        },
+        h4: {
+          ...theme.typography.xl,
+          fontWeight: '600',
+          letterSpacing: -0.5,
+        },
+        p: {
+          marginTop: 12,
+          lineHeight: 28,
+        },
+        blockquote: {
+          marginTop: 16,
+          paddingLeft: 12,
+          borderLeftWidth: 2,
+          borderColor: theme.colors.border,
+          fontStyle: 'italic',
+        },
+        code: {
+          ...theme.typography.sm,
+          fontFamily: 'monospace',
+          fontWeight: '600',
+          backgroundColor: theme.colors.muted,
+          borderRadius: theme.radius.sm,
+          paddingHorizontal: 5,
+          paddingVertical: 3,
+        },
+        lead: {
+          ...theme.typography.xl,
+          color: theme.colors.mutedForeground,
+        },
+        large: {
+          ...theme.typography.lg,
+          fontWeight: '600',
+        },
+        small: {
+          fontSize: 14,
+          lineHeight: 14,
+          fontWeight: '500',
+        },
+        muted: {
+          ...theme.typography.sm,
+          color: theme.colors.mutedForeground,
+        },
       },
     },
-    defaultVariants: {
-      variant: 'default',
-    },
-  }
-);
+  },
+}));
 
-type TextVariantProps = VariantProps<typeof textVariants>;
-
-type TextVariant = NonNullable<TextVariantProps['variant']>;
+type TextVariant = NonNullable<UnistylesVariants<typeof styles>['variant']>;
 
 const ROLE: Partial<Record<TextVariant, Role>> = {
   h1: 'heading',
   h2: 'heading',
   h3: 'heading',
   h4: 'heading',
-  blockquote: Platform.select({ web: 'blockquote' as Role }),
-  code: Platform.select({ web: 'code' as Role }),
 };
 
-const ARIA_LEVEL: Partial<Record<TextVariant, string>> = {
-  h1: '1',
-  h2: '2',
-  h3: '3',
-  h4: '4',
+const ARIA_LEVEL: Partial<Record<TextVariant, number>> = {
+  h1: 1,
+  h2: 2,
+  h3: 3,
+  h4: 4,
 };
 
-const TextClassContext = React.createContext<string | undefined>(undefined);
+/** Lets a parent (e.g. `Button`, `Card`) push a text style — usually a `color` — onto descendant `Text`/`Icon`. */
+const TextStyleContext = React.createContext<StyleProp<TextStyle> | undefined>(undefined);
 
-function Text({
-  className,
-  asChild = false,
-  variant = 'default',
-  ...props
-}: React.ComponentProps<typeof RNText> &
-  TextVariantProps &
-  React.RefAttributes<RNText> & {
+type TextProps = React.ComponentProps<typeof RNText> &
+  UnistylesVariants<typeof styles> & {
     asChild?: boolean;
-  }) {
-  const textClass = React.useContext(TextClassContext);
+  };
+
+function Text({ variant, asChild = false, style, ...props }: TextProps) {
+  const contextStyle = React.useContext(TextStyleContext);
+  styles.useVariants({ variant });
   const Component = asChild ? Slot.Text : RNText;
   return (
     <Component
-      className={cn(textVariants({ variant }), textClass, className)}
+      style={[styles.text, contextStyle, style]}
       role={variant ? ROLE[variant] : undefined}
       aria-level={variant ? ARIA_LEVEL[variant] : undefined}
       {...props}
@@ -86,4 +115,4 @@ function Text({
   );
 }
 
-export { Text, TextClassContext };
+export { Text, TextStyleContext };

@@ -1,38 +1,29 @@
-import { cn } from '@/lib/utils';
 import type { LucideIcon, LucideProps } from 'lucide-react-native';
-import { cssInterop } from 'nativewind';
+import * as React from 'react';
+import { StyleSheet } from 'react-native';
+import { useUnistyles } from 'react-native-unistyles';
+import { TextStyleContext } from './text';
 
 type IconProps = LucideProps & {
   as: LucideIcon;
 };
 
-function IconImpl({ as: IconComponent, ...props }: IconProps) {
-  return <IconComponent {...props} />;
-}
-
-cssInterop(IconImpl, {
-  className: {
-    target: 'style',
-    nativeStyleToProp: {
-      height: 'size',
-      width: 'size',
-    },
-  },
-});
-
 /**
- * Wrapper for Lucide icons with NativeWind `className` support via `cssInterop`.
+ * Wrapper for Lucide icons. Color resolves from the explicit `color` prop, then any
+ * inherited text color (e.g. inside a `Button` or `Card`), then the theme foreground.
  *
  * @example
  * import { ArrowRight } from 'lucide-react-native';
- * <Icon as={ArrowRight} className="text-red-500" size={16} />
+ * <Icon as={ArrowRight} size={16} />
  */
-function Icon({ as: IconComponent, className, size = 14, ...props }: IconProps) {
+function Icon({ as: IconComponent, size = 14, color, ...props }: IconProps) {
+  const { theme } = useUnistyles();
+  const contextStyle = React.useContext(TextStyleContext);
+  const inheritedColor = StyleSheet.flatten(contextStyle)?.color as string | undefined;
   return (
-    <IconImpl
-      as={IconComponent}
-      className={cn('text-foreground', className)}
+    <IconComponent
       size={size}
+      color={color ?? inheritedColor ?? theme.colors.foreground}
       {...props}
     />
   );

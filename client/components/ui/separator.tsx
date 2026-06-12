@@ -1,21 +1,32 @@
-import { cn } from '@/lib/utils';
 import * as SeparatorPrimitive from '@rn-primitives/separator';
+import * as React from 'react';
+import { StyleSheet } from 'react-native-unistyles';
+
+const styles = StyleSheet.create((theme) => ({
+  base: {
+    flexShrink: 0,
+    backgroundColor: theme.colors.border,
+    variants: {
+      orientation: {
+        horizontal: { height: 1, width: '100%' },
+        vertical: { height: '100%', width: 1 },
+      },
+    },
+  },
+}));
 
 function Separator({
-  className,
+  style,
   orientation = 'horizontal',
   decorative = true,
   ...props
 }: SeparatorPrimitive.RootProps & React.RefAttributes<SeparatorPrimitive.RootRef>) {
+  styles.useVariants({ orientation });
   return (
     <SeparatorPrimitive.Root
       decorative={decorative}
       orientation={orientation}
-      className={cn(
-        'bg-border shrink-0',
-        orientation === 'horizontal' ? 'h-[1px] w-full' : 'h-full w-[1px]',
-        className
-      )}
+      style={[styles.base, style]}
       {...props}
     />
   );

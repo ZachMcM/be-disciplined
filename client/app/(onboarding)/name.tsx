@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { authClient } from "@/lib/auth-client";
 import { patchUserName } from "@/lib/endpoints";
-import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
@@ -13,6 +12,7 @@ import {
   Platform,
   View,
 } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { toast } from "sonner-native";
 import * as z from "zod";
 
@@ -23,7 +23,58 @@ const NameSchema = z.object({
 
 type NameFormValues = z.infer<typeof NameSchema>;
 
+const styles = StyleSheet.create((theme) => ({
+  screen: {
+    flex: 1,
+    alignItems: "center",
+    backgroundColor: theme.colors.background,
+  },
+  container: {
+    width: "100%",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 16,
+    padding: 32,
+  },
+  headerGroup: {
+    width: "100%",
+    flexDirection: "column",
+    gap: 4,
+  },
+  title: {
+    fontSize: 20,
+    lineHeight: 28,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  subtitleCenter: {
+    textAlign: "center",
+  },
+  row: {
+    width: "100%",
+    flexDirection: "row",
+    gap: 8,
+  },
+  field: {
+    flex: 1,
+    flexDirection: "column",
+    gap: 8,
+  },
+  inputError: {
+    borderColor: theme.colors.destructive,
+  },
+  errorText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: theme.colors.destructive,
+  },
+  fullWidth: {
+    width: "100%",
+  },
+}));
+
 export default function NameOnboardingScreen() {
+  const { theme } = useUnistyles();
   const { refetch: refetchAuthClient } = authClient.useSession();
 
   const {
@@ -51,38 +102,34 @@ export default function NameOnboardingScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
-      className="flex-1 items-center bg-background"
+      style={styles.screen}
     >
-      <View className="flex w-full flex-col items-center gap-4 p-8">
-        <View className="flex w-full flex-col gap-1">
-          <Text className="text-xl font-bold text-center">
-            What's your name?
-          </Text>
-          <Text className="text-center" variant="muted">
+      <View style={styles.container}>
+        <View style={styles.headerGroup}>
+          <Text style={styles.title}>What's your name?</Text>
+          <Text style={styles.subtitleCenter} variant="muted">
             This helps others find and identify you.
           </Text>
         </View>
-        <View className="flex w-full flex-row gap-2">
+        <View style={styles.row}>
           <Controller
             control={control}
             name="firstName"
             render={({ field: { onChange, onBlur, value } }) => (
-              <View className="flex flex-1 flex-col gap-2">
+              <View style={styles.field}>
                 <Input
                   autoFocus
                   placeholder="First"
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
-                  className={cn(errors.firstName && "border-destructive")}
+                  style={errors.firstName && styles.inputError}
                   autoCapitalize="words"
                   textContentType="givenName"
                   returnKeyType="next"
                 />
                 {errors.firstName && (
-                  <Text className="text-sm font-medium text-destructive">
-                    {errors.firstName.message}
-                  </Text>
+                  <Text style={styles.errorText}>{errors.firstName.message}</Text>
                 )}
               </View>
             )}
@@ -91,22 +138,20 @@ export default function NameOnboardingScreen() {
             control={control}
             name="lastName"
             render={({ field: { onChange, onBlur, value } }) => (
-              <View className="flex flex-1 flex-col gap-2">
+              <View style={styles.field}>
                 <Input
                   placeholder="Last"
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
-                  className={cn(errors.lastName && "border-destructive")}
+                  style={errors.lastName && styles.inputError}
                   autoCapitalize="words"
                   textContentType="familyName"
                   returnKeyType="done"
                   onSubmitEditing={handleSubmit((values) => mutate(values))}
                 />
                 {errors.lastName && (
-                  <Text className="text-sm font-medium text-destructive">
-                    {errors.lastName.message}
-                  </Text>
+                  <Text style={styles.errorText}>{errors.lastName.message}</Text>
                 )}
               </View>
             )}
@@ -114,17 +159,14 @@ export default function NameOnboardingScreen() {
         </View>
 
         <Button
-          className="w-full"
+          style={styles.fullWidth}
           size="lg"
           disabled={isPending}
           onPress={handleSubmit((values) => mutate(values))}
         >
           <Text>Continue</Text>
           {isPending && (
-            <ActivityIndicator
-              size="small"
-              className="text-primary-foreground"
-            />
+            <ActivityIndicator size="small" color={theme.colors.primaryForeground} />
           )}
         </Button>
       </View>
