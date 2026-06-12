@@ -71,6 +71,11 @@ postsRoute.post(
   },
 );
 
+/** Return the full list of available tags. */
+postsRoute.get("/tags", (_req, res) => {
+  res.json(tagsList);
+});
+
 /** Create a new post. */
 postsRoute.post("/posts", authMiddleware, async (req, res) => {
   try {
