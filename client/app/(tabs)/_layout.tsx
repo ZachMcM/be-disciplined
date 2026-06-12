@@ -1,4 +1,3 @@
-import { authClient } from "@/lib/auth-client";
 import { THEME } from "@/lib/theme";
 import { router } from "expo-router";
 import { NativeTabs } from "expo-router/unstable-native-tabs";
@@ -7,9 +6,6 @@ import { useColorScheme } from "nativewind";
 export default function TabsLayout() {
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? "light"];
-
-  const { data: session } = authClient.useSession();
-  const avatarUri = session?.user?.image;
 
   return (
     <NativeTabs tintColor={theme.primary}>
@@ -37,17 +33,9 @@ export default function TabsLayout() {
         <NativeTabs.Trigger.Icon sf="plus.circle.fill" md="add_circle" />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="(profile)">
+        <NativeTabs.Trigger.Icon sf="person.crop.circle.fill" md="person" />
         <NativeTabs.Trigger.Label hidden>Profile</NativeTabs.Trigger.Label>
-        {avatarUri ? (
-          <NativeTabs.Trigger.Icon
-            src={{ uri: avatarUri }}
-            renderingMode="original"
-          />
-        ) : (
-          <NativeTabs.Trigger.Icon sf="person.crop.circle.fill" md="person" />
-        )}
       </NativeTabs.Trigger>
-
       <NativeTabs.Trigger name="(groups)">
         <NativeTabs.Trigger.Label hidden>Groups</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="person.2.fill" md="groups" />
